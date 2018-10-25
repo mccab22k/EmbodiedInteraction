@@ -1,4 +1,4 @@
-package physicsKiera;
+package kieraPhysics;
 
 import processing.core.PApplet;
 import processing.core.PVector;

@@ -1,4 +1,4 @@
-package kinectKiera;
+package kieraKinect;
 
 import java.awt.Color;
 import java.io.IOException;

@@ -1,4 +1,4 @@
-package physicsKiera;
+package kieraPhysics;
 
 import java.util.ArrayList;
 
