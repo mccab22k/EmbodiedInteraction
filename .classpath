@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/midPose"/>
-	<classpathentry kind="src" path=""/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/midPosePC"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/ProcessingPC"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Processing"/>
-	<classpathentry kind="output" path=""/>
+	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -14,7 +14,8 @@ import processing.core.PVector;
  *
  */
 public class KierasModifiedKinectDemo extends PApplet {
-	
+	PVector mouseLoc;
+
 	public static int PROJECTOR_WIDTH = 1024;
 	public static int PROJECTOR_HEIGHT = 786;
 	TCPBodyReceiver kinectReader;
@@ -64,9 +65,17 @@ public class KierasModifiedKinectDemo extends PApplet {
 
 	}
 	public void draw(){
+		
 		setScale(.5f);
 		noStroke();
 
+		try {
+			handlePoints();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			System.exit(0);
+		}
+		
 		background(200); //comment out this to leave trails instead of clearing background 
 
 		KinectBodyData bodyData = kinectReader.getMostRecentData(); 
@@ -159,7 +168,18 @@ public class KierasModifiedKinectDemo extends PApplet {
 		}
 		fill(color.getRGB());	
 	}
+	
+	public void mouseClicked() {
+		System.out.println(mouseLoc.x+ ", "+ mouseLoc.y);  //Print click coordinates
+	}
 
+	/**
+	 * These are for the printing coordinates
+	 * @throws InterruptedException
+	 */
+	public void handlePoints() throws InterruptedException {
+		mouseLoc = new PVector(mouseX,mouseY);
+	}
 	public static void main(String[] args) {
 		PApplet.main(KierasModifiedKinectDemo.class.getName());
 	}
