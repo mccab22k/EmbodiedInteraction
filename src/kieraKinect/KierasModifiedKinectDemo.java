@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import edu.mtholyoke.cs.comsc243.kinect.Body;
 import edu.mtholyoke.cs.comsc243.kinect.KinectBodyData;
+import edu.mtholyoke.cs.comsc243.kinectTCP.PoseFileReader;
 import edu.mtholyoke.cs.comsc243.kinectTCP.TCPBodyReceiver;
 import processing.core.PApplet;
 import processing.core.PVector;
@@ -16,10 +17,15 @@ import processing.core.PVector;
 public class KierasModifiedKinectDemo extends PApplet {
 	PVector mouseLoc;
 
+	/**projector dimensions and display info*/
 	public static int PROJECTOR_WIDTH = 1024;
 	public static int PROJECTOR_HEIGHT = 786;
-	TCPBodyReceiver kinectReader;
 	public static float PROJECTOR_RATIO = (float)PROJECTOR_HEIGHT/(float)PROJECTOR_WIDTH;
+
+	/**for live/ read file*/
+	public TCPBodyReceiver kinectLive;
+	public PoseFileReader kinectReader;
+	boolean live=false;
 
 	public void createWindow(boolean useP2D, boolean isFullscreen, float windowsScale) {
 		if (useP2D) {
@@ -36,10 +42,14 @@ public class KierasModifiedKinectDemo extends PApplet {
 			}
 		}		
 	}
-	
-	// use lower numbers to zoom out (show more of the world)
-	// zoom of 1 means that the window is 2 meters wide and appox 1 meter tall in real world units
-	// sets 0,0 to center of screen
+
+	/**
+	 * use lower numbers to zoom out (show more of the world)
+	 * zoom of 1 means that the window is 2 meters wide and appox
+	 * 1 meter tall in real world units sets 0,0 to center of screen
+	 * @param zoom
+	 */
+
 	public void setScale(float zoom) {
 		scale(zoom* width/2.0f, zoom * -width/2.0f);
 		translate(1f/zoom , -PROJECTOR_RATIO/zoom );		
@@ -53,11 +63,25 @@ public class KierasModifiedKinectDemo extends PApplet {
 
 		String address = "138.110.92.93";
 		int port = 8008;
-		System.out.println("Trying to connect to " + address + ":" + port);
-		kinectReader = new TCPBodyReceiver(address, 8008);
 		
+		if(live!=true) {
+			String filename="treePose2";
+			int loopCount=-1;
+			try {
+				kinectReader = new PoseFileReader(filename, loopCount);
+			} catch (IOException e) {
+				System.out.println("Unable to create kinect producer");
+			}
+			System.out.println("file read");
+		} else {
+			kinectLive = new TCPBodyReceiver(address,port);
+			System.out.println("Trying to connect to " + address + ":" + port);
+		}
+
 		try {
-			kinectReader.start();
+			if(live==true) {
+				kinectLive.start();
+				} else {kinectReader.start(); }
 		} catch (IOException e) {
 			System.out.println("Unable to connect to kinect server");
 			exit();
@@ -65,7 +89,7 @@ public class KierasModifiedKinectDemo extends PApplet {
 
 	}
 	public void draw(){
-		
+
 		setScale(.5f);
 		noStroke();
 
@@ -75,10 +99,16 @@ public class KierasModifiedKinectDemo extends PApplet {
 			e.printStackTrace();
 			System.exit(0);
 		}
-		
+
 		background(200); //comment out this to leave trails instead of clearing background 
 
-		KinectBodyData bodyData = kinectReader.getMostRecentData(); 
+		KinectBodyData bodyData;
+		if (live==true) {
+			bodyData = kinectLive.getMostRecentData();
+		} else { 
+			bodyData=kinectReader.getMostRecentData();
+			}
+		
 		if(bodyData == null) return;
 		Body person = bodyData.getPerson(0);
 		if(person != null){
@@ -95,16 +125,16 @@ public class KierasModifiedKinectDemo extends PApplet {
 
 			fill(255,255,255);
 			noStroke();
-//			drawIfValid(head);
-//			drawIfValid(spine);
-//			drawIfValid(spineBase);
-//			drawIfValid(shoulderLeft);
-//			drawIfValid(shoulderRight);
-//			drawIfValid(footLeft);
-//			drawIfValid(footRight);
-//			drawIfValid(handLeft);
-//			drawIfValid(handRight);
-			
+			//			drawIfValid(head);
+			//			drawIfValid(spine);
+			//			drawIfValid(spineBase);
+			//			drawIfValid(shoulderLeft);
+			//			drawIfValid(shoulderRight);
+			//			drawIfValid(footLeft);
+			//			drawIfValid(footRight);
+			//			drawIfValid(handLeft);
+			//			drawIfValid(handRight);
+
 			drawIfValid(head, Color.red);
 			drawIfValid(spine, Color.BLUE);
 			drawIfValid(spineBase, Color.BLUE);
@@ -114,7 +144,7 @@ public class KierasModifiedKinectDemo extends PApplet {
 			drawIfValid(footRight, Color.GREEN);
 			drawIfValid(handLeft, Color.MAGENTA);
 			drawIfValid(handRight, Color.PINK);
-	
+
 
 			if( 
 					(footRight != null) &&
@@ -143,7 +173,7 @@ public class KierasModifiedKinectDemo extends PApplet {
 				curveVertex(spine.x, spine.y);
 				curveVertex(spineBase.x, spineBase.y);
 				endShape();
-				}
+			}
 		}
 	}
 
@@ -153,11 +183,11 @@ public class KierasModifiedKinectDemo extends PApplet {
 	 * will return null if the joint isn't tracked. 
 	 * @param vec
 	 */
-//	public void drawIfValid(PVector vec) {
-//		if(vec != null) {
-//			ellipse(vec.x, vec.y, .1f,.1f);
-//		}
-//	}
+	//	public void drawIfValid(PVector vec) {
+	//		if(vec != null) {
+	//			ellipse(vec.x, vec.y, .1f,.1f);
+	//		}
+	//	}
 	public void drawIfValid(PVector vec, Color color) {
 		if(vec != null) {	
 			//			fill(color.getRGB());
@@ -168,7 +198,7 @@ public class KierasModifiedKinectDemo extends PApplet {
 		}
 		fill(color.getRGB());	
 	}
-	
+
 	public void mouseClicked() {
 		System.out.println(mouseLoc.x+ ", "+ mouseLoc.y);  //Print click coordinates
 	}
